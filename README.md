@@ -4,11 +4,11 @@ A scalable, asynchronous document processing service that ingests examination pa
 
 ---
 
-## Current Status: Module 1 (Core Configuration & Security)
+## Current Status: Modules 1 & 2 (Core Config, Security & Data Models / Persistence)
 
-This release implements **Module 1**: the central configuration and security foundations required for production-grade, multi-tenant document isolation and API protection.
+This release implements **Module 1** and **Module 2**: the central configuration, security foundations, relational database models, Alembic migrations, and persistence layer required for enterprise document isolation and question extraction.
 
-### Features in Module 1:
+### Features in Module 1 (Core Configuration & Security):
 - **Typed Environment Configuration (`app/core/config.py`)**:
   - Powered by `pydantic-settings` to parse environment variables and `.env` files.
   - Dual-database support: Production PostgreSQL with automatic SQLite fallback for lightweight development.
@@ -21,6 +21,21 @@ This release implements **Module 1**: the central configuration and security fou
 - **FastAPI Authentication & RBAC (`app/core/auth.py`)**:
   - `OAuth2PasswordBearer` security scheme.
   - Role-Based Access Control (`ADMIN`, `REVIEWER`, `USER`) dependency factories enforcing granular authorization.
+
+### Features in Module 2 (Data Models & Persistence):
+- **Comprehensive Relational Schema (`app/models/`)**:
+  - **`User`**: Multi-tenant user management with hashed credentials and roles.
+  - **`Document`**: Document tracking (file name, path, SHA-256 hash, MIME type, page count, processing status).
+  - **`Question`**: Extracted questions with question number, stem text, type (MCQ, Multi-select, Numerical, Descriptive), confidence score, source pages array, and bounding boxes.
+  - **`QuestionOption`**: Extracted MCQ choices (`A`, `B`, `C`, `D`, etc.) linked to parent question with visual coordinates.
+  - **`AnswerKey`**: Verified or extracted answer keys with normalization and explanations.
+  - **`ExtractionWarning`**: Quality audit flags (`LOW_CONFIDENCE`, `BLURRED_REGION`, `MISSING_OPTIONS`, etc.) with severities (`INFO`, `WARNING`, `CRITICAL`).
+  - **`DocumentRelationship`**: Cross-document linking (e.g. associating Question Paper documents with separate Answer Key documents).
+- **Alembic Database Migrations (`alembic/`)**:
+  - Auto-configured environment supporting both PostgreSQL and SQLite.
+  - Migration script: `ecb65454b9f3_initial_schema.py`.
+- **Validation Schemas (`app/schemas/`)**:
+  - Strict Pydantic v2 schemas for all entities supporting API serialization and input validation.
 
 ---
 
@@ -51,56 +66,27 @@ cp .env.example .env
 ```
 Default `.env` configuration runs with lightweight SQLite enabled (`USE_SQLITE=True`) so you can run the service without external database servers.
 
-### 4. Run Tests
+### 4. Run Database Migrations
 ```bash
-pytest tests/unit/test_security.py -v
+alembic upgrade head
 ```
 
----
+### 5. Run Automated Tests
+```bash
+pytest tests/unit/test_security.py tests/unit/test_models.py -v
+```
 
-## Live Deployment on Render
-
-### Can this project be pushed live on Render?
-**Yes, absolutely!** Render is an excellent, cloud-native platform for this service. Render natively provides:
-1. **Web Services**: Runs FastAPI using `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
-2. **Managed PostgreSQL**: 1-click managed database instance that auto-injects `DATABASE_URL`.
-3. **Managed Redis**: In-memory Redis instance for Celery/async processing jobs.
-4. **Background Workers**: Dedicated worker service running `celery -A app.workers.tasks worker`.
-
-### Step-by-Step Render Deployment Guide:
-
-1. **Push your code to GitHub** (`main` branch).
-2. **Log in to [Render.com](https://render.com/)** with your GitHub account.
-3. **Create a PostgreSQL Database**:
-   - Click **New +** $\to$ **PostgreSQL**.
-   - Name: `doc-intel-db`.
-   - Render will generate an internal database URL.
-4. **Create a Redis Instance**:
-   - Click **New +** $\to$ **Redis**.
-   - Name: `doc-intel-redis`.
-5. **Create the FastAPI Web Service**:
-   - Click **New +** $\to$ **Web Service**.
-   - Select your repository: `muskanuppal08/Doc-intel-extract`.
-   - Runtime: **Python 3**.
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - Under **Environment Variables**, add:
-     - `DATABASE_URL`: `[Paste Internal PostgreSQL URL from Step 3]`
-     - `REDIS_URL`: `[Paste Internal Redis URL from Step 4]`
-     - `SECRET_KEY`: `[Your secure 64-character random key]`
-     - `OCR_ENGINE`: `hybrid`
-     - `AI_PROVIDER`: `gemini` (or `mock` for zero-cost demo)
-     - `GEMINI_API_KEY`: `[Your Google Gemini API Key]`
-6. **Click "Create Web Service"**:
-   - Render will build your dependencies, start the FastAPI application, and give you a public HTTPS URL (e.g. `https://doc-intel-extract.onrender.com`).
-   - You can immediately open `https://doc-intel-extract.onrender.com/docs` to access the interactive Swagger UI!
+### 6. Run Module 1 & 2 Verification Script
+```bash
+python scripts/verify_modules_1_2.py
+```
 
 ---
 
 ## Project Roadmap
 
 - [x] **Module 1**: Core Configuration & Security (JWT, RBAC, Pydantic settings)
-- [ ] **Module 2**: PostgreSQL Data Models & Alembic Migrations
+- [x] **Module 2**: PostgreSQL Data Models & Alembic Migrations
 - [ ] **Module 3**: Secure Storage & Binary Magic Byte Validation
 - [ ] **Module 4**: Document Preprocessing, Deskewing & High-DPI Rasterization
 - [ ] **Module 5**: Multi-page Question Extraction & AI Vision Engine
