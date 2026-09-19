@@ -4,9 +4,9 @@ A scalable, asynchronous document processing service that ingests examination pa
 
 ---
 
-## Current Status: Modules 1 & 2 (Core Config, Security & Data Models / Persistence)
+## Current Status: Modules 1, 2 & 3 (Core Config, Models & Secure Storage)
 
-This release implements **Module 1** and **Module 2**: the central configuration, security foundations, relational database models, Alembic migrations, and persistence layer required for enterprise document isolation and question extraction.
+This release implements **Module 1**, **Module 2**, and **Module 3**: configuration, cryptographic security, relational persistence models, Alembic migrations, and enterprise-grade binary storage validation.
 
 ### Features in Module 1 (Core Configuration & Security):
 - **Typed Environment Configuration (`app/core/config.py`)**:
@@ -36,6 +36,17 @@ This release implements **Module 1** and **Module 2**: the central configuration
   - Migration script: `ecb65454b9f3_initial_schema.py`.
 - **Validation Schemas (`app/schemas/`)**:
   - Strict Pydantic v2 schemas for all entities supporting API serialization and input validation.
+
+### Features in Module 3 (Storage & File Management):
+- **Binary Magic Byte Validation (`app/storage/validators.py`)**:
+  - Header inspection directly examining byte signatures (`%PDF-`, `\x89PNG`, `\xFF\xD8\xFF`).
+  - Strict rejection of spoofed extensions (e.g. renamed `.exe` or `.sh` files masquerading as PDFs).
+  - Cross-platform path traversal neutralization (neutralizing both `../` and `..\`).
+  - Enforces 50MB file size limit and rejects empty 0-byte uploads.
+- **Storage Service & Deduplication (`app/storage/service.py`)**:
+  - SHA-256 content hashing to detect duplicate uploads and save storage/compute.
+  - Isolated tenant storage namespaces.
+  - Crop management for storing cropped diagram bounding boxes in `storage/crops/`.
 
 ---
 
@@ -73,7 +84,7 @@ alembic upgrade head
 
 ### 5. Run Automated Tests
 ```bash
-pytest tests/unit/test_security.py tests/unit/test_models.py -v
+pytest tests/unit/test_security.py tests/unit/test_models.py tests/unit/test_storage.py -v
 ```
 
 ### 6. Run Module 1 & 2 Verification Script
@@ -87,7 +98,7 @@ python scripts/verify_modules_1_2.py
 
 - [x] **Module 1**: Core Configuration & Security (JWT, RBAC, Pydantic settings)
 - [x] **Module 2**: PostgreSQL Data Models & Alembic Migrations
-- [ ] **Module 3**: Secure Storage & Binary Magic Byte Validation
+- [x] **Module 3**: Secure Storage & Binary Magic Byte Validation
 - [ ] **Module 4**: Document Preprocessing, Deskewing & High-DPI Rasterization
 - [ ] **Module 5**: Multi-page Question Extraction & AI Vision Engine
 - [ ] **Module 6**: Answer Key Parsing & Fuzzy Linking
