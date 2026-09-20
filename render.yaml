@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: doc-intel-extract
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python -m app.db.init_db
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: USE_SQLITE
+        value: "True"
+      - key: OCR_ENGINE
+        value: mock
+      - key: SECRET_KEY
+        generateValue: true
