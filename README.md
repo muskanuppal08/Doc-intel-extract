@@ -6,11 +6,8 @@
 [![Task Broker](https://img.shields.io/badge/queue-Redis%20%26%20Celery-DC382D.svg?logo=redis)](https://redis.io/)
 [![OCR Engine](https://img.shields.io/badge/OCR-PyMuPDF%20%2B%20Gemini%20Vision-orange.svg)]()
 [![Tests](https://img.shields.io/badge/tests-38%2F38%20passing-brightgreen.svg)]()
-[![Deploy on Render](https://img.shields.io/badge/deploy-Render%20Ready-46E3B7.svg?logo=render)](https://render.com/)
 
 An enterprise-grade, asynchronous document intelligence system engineered to ingest examination papers (digital PDFs, smartphone photos, and degraded scans) and transform them into structured, validated question items, mathematical equations, diagram image snippets, and verified answer keys.
-
-Built by **Muskan Uppal** (UID: `12307888`, B.Tech CSE) for **PBNC Private Limited**.
 
 ---
 
@@ -161,55 +158,14 @@ Every requirement has a dedicated test asset in `demo_assets/`:
 
 Follow these steps directly in your browser at **[http://localhost:8000/docs](http://localhost:8000/docs)**:
 
-1. **Authorize**: Click the green **Authorize 🔓** button at the top right:
-   - `username`: `admin@pbnc.internal`
-   - `password`: `admin12345`
-   - Click **Authorize** $\to$ **Close**.
-2. **Upload Examination**: Open `POST /api/v1/documents/upload` $\to$ **Try it out** $\to$ select `demo_assets/comprehensive_master_exam.pdf` $\to$ **Execute**.
+1. **Upload Examination**: Open `POST /api/v1/documents/upload` $\to$ **Try it out** $\to$ select `demo_assets/comprehensive_master_exam.pdf` $\to$ **Execute**.
    - Immediate response: `202 Accepted` with your `document_id`.
-3. **Poll Processing Status**: Open `GET /api/v1/documents/{id}/status` $\to$ paste `document_id` $\to$ **Execute**.
+2. **Poll Processing Status**: Open `GET /api/v1/documents/{id}/status` $\to$ paste `document_id` $\to$ **Execute**.
    - Shows `status: "completed"`, `page_count: 2`, and questions extracted.
-4. **View Extracted Questions**: Open `GET /api/v1/documents/{id}/questions` $\to$ paste `document_id` $\to$ **Execute**.
+3. **View Extracted Questions**: Open `GET /api/v1/documents/{id}/questions` $\to$ paste `document_id` $\to$ **Execute**.
    - Shows structured questions with options `A`, `B`, `C`, `D`, confidence scores, and bounding boxes.
-5. **Inspect Human Review Queue**: Open `GET /api/v1/review-queue` $\to$ **Execute**.
+4. **Inspect Human Review Queue**: Open `GET /api/v1/review-queue` $\to$ **Execute**.
    - View any flagged questions and resolve them via `POST /api/v1/questions/{id}/resolve`.
-
----
-
-## 🚀 Live Cloud Deployment on Render
-
-This service is architected to deploy natively on **[Render.com](https://render.com/)**:
-
-### 1. Architecture Components on Render
-1. **FastAPI Web Service**: Serves the API and Swagger documentation.
-2. **Managed PostgreSQL**: Relational metadata, questions, and audit logs.
-3. **Managed Redis**: Message broker for Celery asynchronous processing.
-4. **Celery Worker Service**: Dedicated background compute engine.
-
-### 2. Step-by-Step Deployment Guide
-1. Push this repository to GitHub (`main` branch).
-2. Log in to **[Render Dashboard](https://dashboard.render.com/)**.
-3. **Create PostgreSQL Database**:
-   - Click **New +** $\to$ **PostgreSQL** $\to$ Name: `doc-intel-db`.
-   - Copy the internal database URL.
-4. **Create Redis Instance**:
-   - Click **New +** $\to$ **Redis** $\to$ Name: `doc-intel-redis`.
-   - Copy the internal Redis URL.
-5. **Create the FastAPI Web Service**:
-   - Click **New +** $\to$ **Web Service** $\to$ connect `Doc-intel-extract`.
-   - Runtime: **Python 3**
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - Add Environment Variables:
-     - `DATABASE_URL`: `[Internal PostgreSQL URL]`
-     - `REDIS_URL`: `[Internal Redis URL]`
-     - `SECRET_KEY`: `[Your 64-character random key]`
-     - `OCR_ENGINE`: `hybrid`
-     - `AI_PROVIDER`: `gemini` (or `mock` for zero-cost demo)
-     - `GEMINI_API_KEY`: `[Your Google Gemini API Key]`
-6. **Deploy Worker (Optional for Scale)**:
-   - Create a **Background Worker** on Render with start command:
-     `celery -A app.workers.celery_app worker --loglevel=info`
 
 ---
 
@@ -243,13 +199,5 @@ Pre-configured requests include:
 - [x] **Module 9**: Complete REST API Layer & Swagger UI
 - [x] **Module 10**: Postman Collection & 10 End-to-End Demonstration Scenarios
 
----
 
-## 👤 Author & Organization
-
-* **Author**: Muskan Uppal
-* **UID**: `12307888`
-* **Program**: B.Tech in Computer Science and Engineering (CSE)
-* **Organization**: PBNC Private Limited
-* **Repository**: [https://github.com/muskanuppal08/Doc-intel-extract](https://github.com/muskanuppal08/Doc-intel-extract)
 
