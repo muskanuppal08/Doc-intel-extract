@@ -1,11 +1,16 @@
 # 📑 Document Intelligence & Question Extraction Engine (Doc-Intel-Extract)
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-doc--intel--extract.onrender.com-brightgreen?style=for-the-badge&logo=render)](https://doc-intel-extract.onrender.com/docs)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/framework-FastAPI-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Database](https://img.shields.io/badge/database-PostgreSQL%20%7C%20SQLite-336791.svg?logo=postgresql)](https://www.postgresql.org/)
 [![Task Broker](https://img.shields.io/badge/queue-Redis%20%26%20Celery-DC382D.svg?logo=redis)](https://redis.io/)
 [![OCR Engine](https://img.shields.io/badge/OCR-PyMuPDF%20%2B%20Gemini%20Vision-orange.svg)]()
 [![Tests](https://img.shields.io/badge/tests-38%2F38%20passing-brightgreen.svg)]()
+
+> 🚀 **Live Interactive Demo:** [https://doc-intel-extract.onrender.com/docs](https://doc-intel-extract.onrender.com/docs)  
+> 📖 **API ReDoc:** [https://doc-intel-extract.onrender.com/redoc](https://doc-intel-extract.onrender.com/redoc)  
+> 🩺 **Service Health Status:** [https://doc-intel-extract.onrender.com/health](https://doc-intel-extract.onrender.com/health)
 
 An enterprise-grade, asynchronous document intelligence system engineered to ingest examination papers (digital PDFs, smartphone photos, and degraded scans) and transform them into structured, validated question items, mathematical equations, diagram image snippets, and verified answer keys.
 
@@ -156,7 +161,7 @@ Every requirement has a dedicated test asset in `demo_assets/`:
 
 ## 🖥️ Interactive Swagger UI Walkthrough
 
-Follow these steps directly in your browser at **[http://localhost:8000/docs](http://localhost:8000/docs)**:
+Follow these steps directly in your browser on the **[Live Cloud Deployment](https://doc-intel-extract.onrender.com/docs)** (or locally at **[http://localhost:8000/docs](http://localhost:8000/docs)**):
 
 1. **Upload Examination**: Open `POST /api/v1/documents/upload` $\to$ **Try it out** $\to$ select `demo_assets/comprehensive_master_exam.pdf` $\to$ **Execute**.
    - Immediate response: `202 Accepted` with your `document_id`.
